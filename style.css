@@ -359,4 +359,92 @@ dialog strong{color:#1c4b82}dialog p{color:#647687}.close-dialog{color:#62788a}
   .vector-work-panel{background:#f6f7f8}
 }
 @media(max-width:1100px){.vector-work-panel{background:#f6f7f8}}
+.reading-guide{display:none!important}
+@media(min-width:1101px){.reading-layout{grid-template-rows:minmax(0,1fr)}}
+
+/* Three-column editing desk: controls at the edges, result alone in the center. */
+.topbar{height:54px;padding:0 15px;gap:14px}
+.wordmark{font-size:16px}.mark{font-size:25px}
+.top-caption{font-size:9px;letter-spacing:.7px;padding-left:13px}
+.header-actions{gap:6px}
+.header-actions button:not(.quiet){padding:6px 9px;font-size:11px;gap:6px;white-space:nowrap}
+.header-actions .quiet{font-size:11px;margin-right:3px}
+.header-actions .quiet span{margin-left:3px}
+.header-actions .primary span{font-size:14px}
+.reading-work-panel #lab-pane{border:0;border-radius:0;background:#f6f7f8}
+.reading-work-panel #lab-pane:after{display:none}
+@media(min-width:800px){
+  html,body{height:100%;overflow:hidden}
+  .workspace{height:calc(100vh - 54px);min-height:0;display:grid;grid-template-columns:clamp(178px,15vw,228px) minmax(0,1fr) clamp(240px,20vw,310px);gap:0}
+  .controls{grid-column:1;grid-row:1;min-height:0;height:100%;overflow-y:auto;overflow-x:hidden;padding:12px 11px;border-right:1px solid #dce3e9;margin:0;border-top:0;border-bottom:0;border-left:0;border-radius:0;scrollbar-width:thin}
+  .controls .panel-heading{margin:0 0 9px;font-size:9px}
+  .controls .control-section{padding-bottom:8px;margin-bottom:9px}
+  .controls h2{font-size:11px;margin-bottom:7px;gap:6px}
+  .controls .dropzone{padding:8px 4px;gap:2px}
+  .controls .upload-icon{display:none}
+  .controls .dropzone strong{font-size:11px}
+  .controls .dropzone>span:not(.upload-icon){font-size:9px}
+  .controls .dropzone small{font-size:8px;margin-top:1px}
+  .controls .source-links{margin:5px 0 7px;gap:5px}
+  .controls .source-links .text-button{font-size:9px}
+  .controls .model-card{padding:5px;gap:5px}
+  .controls .cube-icon{font-size:20px;line-height:20px}
+  .controls .model-card strong{max-width:140px;font-size:10px}
+  .controls .model-card div span{font-size:8px}
+  .controls .privacy,.controls .range-labels,.controls .scan-note,.controls .toggle-row,#slice-controls,#motion-panel,#lab-panel,.sidebar-footer{display:none!important}
+  .controls label{font-size:10px}
+  .controls select{padding:5px 4px;margin-top:3px;font-size:10px}
+  .controls .range-heading{margin:7px 0 2px}
+  .controls .range-heading output{font-size:9px}
+  .controls input[type=range]{margin:4px 0 7px}
+  .controls .reset-look{margin-top:1px;font-size:9px}
+  .controls .page-layout-controls{display:grid;grid-template-columns:1fr 1fr;gap:5px 6px;margin:0;border-bottom:0;padding:0}
+  .controls .page-layout-controls>strong{font-size:11px}
+  .controls .page-layout-controls .reading-control:nth-of-type(3){grid-column:1/-1}
+  .controls .page-layout-controls .range-heading{margin:2px 0}
+  .controls .page-layout-controls .range-heading label{font-size:9px}
+  .controls .page-layout-controls select{font-size:9px;padding:4px 2px}
+  .stage-area,.reading-tab,.reading-work-panel{display:contents}
+  .stage-area>.statusbar,.workspace-grid,.unified-intro,.reading-fidelity,.reading-work-panel>.work-panel-heading{display:none!important}
+  .reading-layout{grid-column:2;grid-row:1;display:block;min-width:0;min-height:0;height:100%;overflow:hidden;padding:0;background:#f6f7f8}
+  .reading-work-panel #lab-pane{display:block;width:100%;height:100%;min-height:0;flex:none}
+  .reading-controls{grid-column:3;grid-row:1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-content:start;min-height:0;height:100%;overflow-y:auto;overflow-x:hidden;margin:0;padding:11px 10px;border:0;border-left:1px solid #dce3e9;border-radius:0;gap:5px 7px;scrollbar-width:thin}
+  .reading-controls h3{font-size:11px;margin:0;line-height:1.2}
+  .reading-controls-intro,.reading-controls>.scan-note,.reading-controls .lab-rule,.reading-controls .lab-exports{display:none!important}
+  .reading-layer-bar{padding:6px;gap:4px;grid-template-columns:1fr}
+  .reading-layer-bar>label:first-child,.reading-layer-bar>span{display:none}
+  .reading-layer-bar select{padding:4px;font-size:9px}
+  .reading-layer-buttons{display:grid;grid-template-columns:1fr 1fr auto auto;gap:3px}
+  .reading-layer-buttons button{padding:4px 3px;font-size:9px;white-space:nowrap}
+  .reading-check{font-size:9px;gap:4px}
+  .reading-check input{width:12px;height:12px}
+  .reading-control>label{font-size:9px;margin:0 0 2px}
+  .reading-control select{font-size:9px;padding:4px 2px}
+  .reading-controls .range-heading{margin:0 0 2px;gap:2px}
+  .reading-controls .range-heading label{font-size:9px;line-height:1.15}
+  .reading-controls .range-heading output{font-size:8px;padding:1px 2px}
+  .reading-controls input[type=range]{margin:3px 0 4px;height:3px}
+  .reading-position{padding-top:5px;margin-top:0}
+  .reading-position-head strong{font-size:10px}
+  .reading-position p{display:none}
+  .reading-align{padding:5px;font-size:9px}
+  .vector-finish-control{padding-top:6px;gap:2px}
+  .vector-finish-control>span{display:none}
+  .vector-options-grid{gap:3px 5px}
+  .palette-layout-controls{gap:3px 5px;padding-top:5px}
+  .palette-layout-controls>strong{font-size:10px}
+  .vector-work-panel{position:fixed;inset:54px 0 0;z-index:30;display:flex;flex-direction:column;overflow:hidden;border-radius:0;padding:10px 14px}
+  .vector-work-layout{min-height:0;flex:1;grid-template-columns:minmax(0,1fr) 280px;gap:10px;align-items:stretch}
+  .vector-pane{height:100%;min-height:0;position:relative;top:auto}
+  #vector-panel{overflow:auto;padding:10px}
+}
+@media(min-width:800px) and (max-width:1050px){
+  .top-caption{display:none}
+  .header-actions .quiet{font-size:0}
+  .header-actions .quiet span{font-size:11px}
+}
+
+
+/* The result occupies the complete center column. */
+.reading-layout{grid-template-rows:minmax(0,1fr)!important}
 

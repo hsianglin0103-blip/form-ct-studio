@@ -309,31 +309,9 @@ function updateRenderInfo(){
  $('ortho-art').setAttribute('aria-label','CT / X-ray: '+(view==='all'?'six orthographic views':view+' orthographic view'));
 }
 function updateReadingGuide(){
- const mode=$('lab-image').value,layer=lab?.selectedLayer();
- const clean=$('lab-vector-finish').checked;
- const explanations={
-   detail:'A full-resolution orthographic scan accumulates textured mesh surfaces, retaining their color and fine markings.',
-   slice:'A movable section window emphasizes one band of the high-resolution surface scan while keeping the rest visible as context. It is a graphic section, not a measured internal CT slice.',
-   projection:'The selected camera reads the textured mesh from a true additional 3D angle, then a neighboring capture adds a subtle projection echo.',
-   sinogram:'Narrow strips alternate between five nearby high-resolution scan angles. Each strip keeps its original surface detail.',
-   stack:'Three nearby high-resolution scan angles overlap, revealing displacement and depth relationships.',
-   wrap:'The high-resolution surface scan bends horizontally in narrow strips, preserving fine source detail.',
-   curve:'Narrow vertical strips follow a curved path while retaining texture and CT coloration.',
-   warp:'Fine horizontal scan strips shift by varying amounts to make a detailed distortion.',
-   vector:'Pixel-scale edge tracing is laid over the original detailed scan; the export preserves the complete final image.'
- };
- $('diagram-mode').textContent=$('lab-image').selectedOptions[0].textContent;
- $('reading-explanation').textContent=clean?`${explanations[mode]} The final color regions are traced into smooth, editable SVG paths.`:explanations[mode];
- $('diagram-voxels-label').textContent='02  TEXTURE';
- $('diagram-angles-label').textContent='03  SCAN';
- $('diagram-map-label').textContent=clean?'04  VECTOR':lab?.layers.length>1?'04  COMBINE':'04  IMAGE';
+ const mode=$('lab-image').value;
  $('slice-reading-control').hidden=mode!=='slice';
  $('effect-reading-control').hidden=mode==='detail';
- $('reading-diagram').setAttribute('aria-label','Textured mesh surfaces are scanned from the selected 3D angle; high-resolution readings align around the same model center and combine into a 2D image');
- $('diagram-angles').textContent=`${$('lab-detail-view').selectedOptions[0].textContent} · ${layer?.angle||0}° additional scan angle`;
- const raster=lab?.raster();
- $('diagram-resolution').textContent=raster?`${raster.w} × ${raster.h} ${clean?'traced vector source':'full-color scan samples'}`:'Native textured scan pending';
- $('diagram-layer-facts').textContent=`${lab?.layers.filter(item=>item.visible).length||0} registered reading${lab?.layers.filter(item=>item.visible).length===1?'':'s'} · shared model center`;
 }
 function selectOrthoView(view){
  if(view==='all'&&$('scan-sweep').checked){$('scan-sweep').checked=false;updateScan();}
