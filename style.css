@@ -448,3 +448,36 @@ dialog strong{color:#1c4b82}dialog p{color:#647687}.close-dialog{color:#62788a}
 /* The result occupies the complete center column. */
 .reading-layout{grid-template-rows:minmax(0,1fr)!important}
 
+/* Shared model, simultaneous 2D composition and interactive 3D CT preview. */
+#reading-layout{display:flex;flex-direction:column;gap:0;padding:0;min-height:0;background:#f6f7f8}
+.center-display-toolbar{display:flex;align-items:center;justify-content:space-between;flex:none;height:35px;padding:5px 10px;border-bottom:1px solid #dce3e9;background:#fff}
+.center-display-toolbar>span{font:9px var(--mono);letter-spacing:1px;color:#61768a}
+.center-display-switch{display:flex;gap:2px;background:#f1f4f7;border:1px solid #dce3e9;border-radius:5px;padding:2px}
+.center-display-switch button{font-size:10px;padding:3px 9px;border:0;border-radius:3px;color:#607287;background:transparent}
+.center-display-switch button[aria-pressed=true]{color:#fff;background:#245487}
+.center-display-views{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);flex:1;min-height:0;min-width:0;gap:1px;background:#dce3e9}
+.center-preview{position:relative;display:flex;flex-direction:column;min-width:0;min-height:0;background:#f6f7f8;overflow:hidden}
+.center-preview-heading{display:flex;align-items:center;justify-content:space-between;gap:6px;height:33px;flex:none;padding:5px 8px;background:#fff;border-bottom:1px solid #dce3e9}
+.center-preview-heading strong{font:9px var(--mono);letter-spacing:.6px;color:#526b81;white-space:nowrap}
+.center-preview-heading>div{display:flex;gap:4px}
+.center-preview-heading button{padding:3px 5px;font-size:9px;white-space:nowrap}
+.center-preview-heading button[aria-pressed=true]{background:#245487;color:#fff;border-color:#245487}
+.reading-work-panel .center-preview #lab-pane,.reading-work-panel .center-preview #viewport{height:auto;min-height:0;width:100%;flex:1;border:0;border-radius:0;overflow:hidden}
+#preview-3d #viewport{background:#f2f6ef;touch-action:none}
+#preview-3d #art{cursor:grab;touch-action:none;outline-offset:-3px}
+#preview-3d #art:active{cursor:grabbing}
+#preview-3d .stage-label,#preview-3d .viewport-bottom,#preview-3d .scan-legend{display:none}
+#preview-3d #viewport:after{display:none}
+.center-orbit-hint{position:absolute;bottom:12px;left:0;right:0;pointer-events:none;text-align:center;font:8px var(--mono);letter-spacing:.6px;color:#567065}
+#reading-layout:not([data-display=both]) .center-display-views{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr)}
+@media(min-width:800px) and (max-width:1049px){
+ #reading-layout[data-display=both] .center-display-views{grid-template-columns:minmax(0,1fr);grid-template-rows:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:799px){
+ #reading-layout{height:auto;overflow:visible}
+ .center-display-views{display:flex;flex-direction:column;flex:none}
+ .reading-work-panel .center-preview #lab-pane,.reading-work-panel .center-preview #viewport{height:330px;min-height:330px;flex:none}
+ .center-preview-heading strong{font-size:10px}
+ .center-preview-heading button{font-size:10px;padding:4px 7px}
+}
+

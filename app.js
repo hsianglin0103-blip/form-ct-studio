@@ -104,7 +104,7 @@ function render(){
  if(orthographicView.dirty&&(!scanState.sweep||performance.now()-lastOrthoFrame>180)){
    orthographicView.render(renderer,scene,currentName);lastOrthoFrame=performance.now();
  }
- renderScan(camera);
+ if(!$('preview-3d').hidden)renderScan(camera);
  volumeRenderer.render(volumeScene,volumeCamera);
 }
 function animate(time) {
@@ -355,6 +355,19 @@ async function entryFiles(entry, prefix = '') {
 }
 
 function bindUI(){
+ const setDisplay=display=>{
+   $('reading-layout').dataset.display=display;
+   $('preview-2d').hidden=display==='3d';
+   $('preview-3d').hidden=display==='2d';
+   document.querySelectorAll('[data-center-display]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.centerDisplay===display)));
+   requestAnimationFrame(()=>{resize();render();});
+ };
+ document.querySelectorAll('[data-center-display]').forEach(button=>button.onclick=()=>setDisplay(button.dataset.centerDisplay));
+ $('preview-rotate').onclick=()=>{
+   orbit.autoRotate=!orbit.autoRotate;
+   $('rotate').checked=orbit.autoRotate;
+   $('preview-rotate').setAttribute('aria-pressed',String(orbit.autoRotate));
+ };
  $('vector-close').onclick=()=>{ $('vector-work-panel').hidden=true; $('reading-vector-edit').focus(); };
  for(const id of ['lab-image','lab-detail-view','lab-slice','lab-angle','lab-effect','lab-palette','lab-resolution','lab-axis','lab-angles','lab-span','lab-filter'])$(id).addEventListener('input',updateReadingGuide);
  document.querySelectorAll('[data-ortho-view]').forEach(button=>button.onclick=()=>selectOrthoView(button.dataset.orthoView));
@@ -374,7 +387,7 @@ function bindUI(){
 
  $('reset-camera').onclick=fitCamera;
  for(const key of Object.keys(scanDefaults))$('scan-'+key).addEventListener('input',()=>{if(key==='position')$('scan-sweep').checked=false;updateScan();});
- $('rotate').onchange=()=>{orbit.autoRotate=$('rotate').checked;};
+ $('rotate').onchange=()=>{orbit.autoRotate=$('rotate').checked;$('preview-rotate').setAttribute('aria-pressed',String(orbit.autoRotate));};
  $('reset-scan').onclick=resetScan;
   $('help').onclick = () => $('help-dialog').showModal(); $('close-help').onclick = $('got-it').onclick = () => $('help-dialog').close();
   $('help-dialog').addEventListener('click', e => { if (e.target === $('help-dialog')) { const r = e.target.getBoundingClientRect(); if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) e.target.close(); } });
@@ -383,7 +396,7 @@ function bindUI(){
  $('export-png-stage').onclick=()=> $('export-png').click();
  $('export-ortho').onclick=()=>{if(!root||renderingFailed)return;render();orthographicView.exportCanvas(currentName).toBlob(blob=>{download(blob,'png','ct-orthographic-'+orthographicView.settings.view);if(blob)toast('Orthographic CT exported as PNG.');},'image/png');};
  $('export-volume').onclick=()=>{if(!lab?.result||renderingFailed)return;volumeRenderer.render(volumeScene,volumeCamera);$('volume-art').toBlob(blob=>{download(blob,'png','ct-volume');if(blob)toast('3D volume exported as PNG.');},'image/png');};
- $('viewport').addEventListener('keydown',e=>{if(e.key.toLowerCase()==='r'){fitCamera();e.preventDefault();}else if(e.key===' '){$('rotate').checked=!$('rotate').checked;orbit.autoRotate=$('rotate').checked;e.preventDefault();}});
+ $('viewport').addEventListener('keydown',e=>{if(e.target!==$('art'))return;if(e.key.toLowerCase()==='r'){fitCamera();e.preventDefault();}else if(e.key===' '){$('preview-rotate').click();e.preventDefault();}});
  updateScan();
  updateReadingGuide();
 }
