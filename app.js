@@ -3,7 +3,8 @@ import { OrbitControls } from './vendor/OrbitControls.js';
 import { GLTFLoader } from './vendor/GLTFLoader.js';
 import { CTView } from './ct-view.js';
 import { OrthographicView, ORTHO_VIEWS } from './orthographic-view.js';
-import { TomographyLab } from './tomography-lab.js';
+import { TomographyLab } from './tomography-lab.js?v=20261005-linked-3d';
+import { Linked3DView } from './linked-3d-view.js';
 import { VectorEditor } from './vector-editor.js';
 
 const $ = id => document.getElementById(id);
@@ -12,7 +13,7 @@ const scanState = {...scanDefaults};
 let renderer,scene,camera,orbit,volumeRenderer,volumeScene,volumeCamera,volumeOrbit,ctView,orthographicView,lab,vectorEditor,postScene,postCamera,postMaterial,root;
 let width=1,height=1,sheetSignature='',scanDirection=1,lastOrthoFrame=0;
 let currentName='',triangleCount=0,textureCount=0,activeImport=null,lastFrame=0,frameCount=0,fpsTime=0;
-let toastTimer,renderingFailed=false;
+let toastTimer,renderingFailed=false,linked3D;
 function toast(message, error = false) {
   $('toast').textContent = message; $('toast').classList.toggle('error', error); $('toast').hidden = false;
   clearTimeout(toastTimer); toastTimer = setTimeout(() => $('toast').hidden = true, error ? 9500 : 4000);
@@ -46,6 +47,7 @@ function initialize() {
  renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.setClearColor(0,0);
  scene=new THREE.Scene();camera=new THREE.PerspectiveCamera(38,1,.01,1000);
  orbit=new OrbitControls(camera,$('viewport'));orbit.enableDamping=true;orbit.dampingFactor=.075;orbit.autoRotateSpeed=.5;orbit.minDistance=.4;orbit.maxDistance=35;
+ orbit.enablePan=false;
  volumeScene=new THREE.Scene();volumeCamera=new THREE.PerspectiveCamera(38,1,.01,1000);
  volumeCamera.position.set(6,4,7);volumeCamera.lookAt(0,0,0);
  volumeRenderer=new THREE.WebGLRenderer({canvas:$('volume-art'),antialias:true,preserveDrawingBuffer:true,powerPreference:'high-performance'});
@@ -76,6 +78,7 @@ function initialize() {
  fragmentShader:'varying vec2 vUv;uniform sampler2D image;uniform vec3 paper;uniform float transparentOutput;void main(){vec4 c=texture2D(image,vUv);gl_FragColor=transparentOutput>.5?c:vec4(mix(paper,c.rgb,c.a),1.);}'
  });
  postScene.add(new THREE.Mesh(new THREE.PlaneGeometry(2,2),postMaterial));
+ linked3D=new Linked3DView(renderer,scene,lab,renderScan);
  const observer=new ResizeObserver(resize);
  for(const id of ['viewport','ortho-viewport','lab-pane','volume-pane'])observer.observe($(id));
  resize();
@@ -85,6 +88,7 @@ function initialize() {
 function resize(){
  width=Math.max(1,$('viewport').clientWidth);height=Math.max(1,$('viewport').clientHeight);
  renderer.setSize(width,height,false);camera.aspect=width/height;camera.updateProjectionMatrix();
+ linked3D?.resize(width,height,renderer.getPixelRatio());
  const ortho=$('ortho-viewport'),reading=$('lab-pane'),volume=$('volume-pane');
  orthographicView.resize(Math.max(1,ortho.clientWidth),Math.max(1,ortho.clientHeight),renderer.getPixelRatio());
  lab?.resize(Math.max(1,reading.clientWidth),Math.max(1,reading.clientHeight),renderer.getPixelRatio());
@@ -104,7 +108,7 @@ function render(){
  if(orthographicView.dirty&&(!scanState.sweep||performance.now()-lastOrthoFrame>180)){
    orthographicView.render(renderer,scene,currentName);lastOrthoFrame=performance.now();
  }
- if(!$('preview-3d').hidden)renderScan(camera);
+ linked3D?.update(camera,orbit.target,scanState);
  volumeRenderer.render(volumeScene,volumeCamera);
 }
 function animate(time) {
@@ -138,6 +142,7 @@ function fitCamera() {
   orbit.target.set(0, 0, 0); camera.position.copy(direction.multiplyScalar(fit));
   camera.near = .01; camera.far = Math.max(100, fit * 15); camera.updateProjectionMatrix(); orbit.update();
   volumeOrbit.target.set(0,0,0);volumeCamera.position.copy(camera.position);volumeCamera.near=.01;volumeCamera.far=camera.far;volumeCamera.updateProjectionMatrix();volumeOrbit.update();
+  if(linked3D){linked3D.fitDistance=camera.position.distanceTo(orbit.target);linked3D.invalidate();}
 }
 function installModel(object, name, detail = '') {
   const box = new THREE.Box3().setFromObject(object);
@@ -151,6 +156,7 @@ function installModel(object, name, detail = '') {
   ctView.setModel(root); ctView.configure(scanState);
   orthographicView.setModel(root);
   lab.setModel(root,name);vectorEditor.clear();lab.updateExportAvailability();
+  linked3D?.invalidate();
   sheetSignature='';
   const textures = new Set();
   root.traverse(child => {
@@ -396,7 +402,7 @@ function bindUI(){
  $('export-png-stage').onclick=()=> $('export-png').click();
  $('export-ortho').onclick=()=>{if(!root||renderingFailed)return;render();orthographicView.exportCanvas(currentName).toBlob(blob=>{download(blob,'png','ct-orthographic-'+orthographicView.settings.view);if(blob)toast('Orthographic CT exported as PNG.');},'image/png');};
  $('export-volume').onclick=()=>{if(!lab?.result||renderingFailed)return;volumeRenderer.render(volumeScene,volumeCamera);$('volume-art').toBlob(blob=>{download(blob,'png','ct-volume');if(blob)toast('3D volume exported as PNG.');},'image/png');};
- $('viewport').addEventListener('keydown',e=>{if(e.target!==$('art'))return;if(e.key.toLowerCase()==='r'){fitCamera();e.preventDefault();}else if(e.key===' '){$('preview-rotate').click();e.preventDefault();}});
+ $('viewport').addEventListener('keydown',e=>{if(!['art','linked-3d-art'].includes(e.target.id))return;if(e.key.toLowerCase()==='r'){fitCamera();e.preventDefault();}else if(e.key===' '){$('preview-rotate').click();e.preventDefault();}});
  updateScan();
  updateReadingGuide();
 }

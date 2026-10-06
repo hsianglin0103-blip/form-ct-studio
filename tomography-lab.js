@@ -309,18 +309,27 @@ export class TomographyLab {
       background:$('lab-background').value
     });
   }
+  composeView(getFrame, layerCache) {
+    return composeReadings(this.layers,getFrame,$('lab-background').value,$('lab-palette').value,color,layerCache);
+  }
+  vectorSettings() {
+    return {detail:+$('lab-vector-detail').value,minRegion:+$('lab-vector-min-region').value,
+      edgeReduction:+$('lab-vector-edges').value,smallRegionMode:$('lab-vector-small-mode').value,
+      geometry:$('lab-vector-geometry').value,paint:$('lab-vector-paint').value,
+      structure:+$('lab-vector-structure').value,lineWidth:+$('lab-vector-line-width').value/10,
+      lineDensity:+$('lab-vector-line-density').value,lineColor:$('lab-vector-line-color').value,
+      background:$('lab-background').value};
+  }
+  appearanceKey() {
+    return JSON.stringify([this.layers,$('lab-palette').value,$('lab-overlay-dark').value,$('lab-overlay-light').value,
+      $('lab-vector-finish').checked,this.vectorSettings(),this.pageLayout({w:720,h:720})]);
+  }
   vectorFinish() {
     if(!$('lab-vector-finish').checked)return null;
     const raster=this.raster();if(!raster)return null;
-    const detail=+$('lab-vector-detail').value;
-    const minRegion=+$('lab-vector-min-region').value,edgeReduction=+$('lab-vector-edges').value;
-    const smallRegionMode=$('lab-vector-small-mode').value;
-    const geometry=$('lab-vector-geometry').value,paint=$('lab-vector-paint').value;
-    const structure=+$('lab-vector-structure').value,lineWidth=+$('lab-vector-line-width').value/10;
-    const lineDensity=+$('lab-vector-line-density').value,lineColor=$('lab-vector-line-color').value;
-    const key=JSON.stringify([detail,minRegion,edgeReduction,smallRegionMode,geometry,paint,structure,lineWidth,lineDensity,lineColor]);
+    const settings=this.vectorSettings(),key=JSON.stringify(settings);
     if(this.vectorCache?.raster===raster&&this.vectorCache.key===key)return this.vectorCache.result;
-    const result=cleanVector(raster.pixels,raster.w,raster.h,{detail,minRegion,edgeReduction,smallRegionMode,geometry,paint,structure,lineWidth,lineDensity,lineColor,background:$('lab-background').value});
+    const result=cleanVector(raster.pixels,raster.w,raster.h,settings);
     this.vectorCache={raster,key,result};
     $('lab-vector-stats').textContent=`${result.stats.regions.toLocaleString()} regions · ${result.stats.edges.toLocaleString()} edges · ${result.stats.lineSegments.toLocaleString()} lines · ${result.stats.mergedComponents.toLocaleString()} merged`;
     return result;
@@ -330,11 +339,9 @@ export class TomographyLab {
     const ctx = this.canvas.getContext('2d'), w = this.canvas.width, h = this.canvas.height;
     if (!w || !h) return;
     const preview=$('clean-vector-preview');preview.hidden=true;
-    ctx.fillStyle='#192120';ctx.fillRect(0,0,w,h);
+    ctx.fillStyle='#f6f8fa';ctx.fillRect(0,0,w,h);
     const raster = this.raster();
-    ctx.textAlign = 'left'; ctx.fillStyle='#a9c4a9';
-    ctx.font = `${Math.max(11, w * .013)}px Consolas, monospace`;
-    ctx.fillText(`HIGH-DEFINITION CT  /  ${raster?.layerCount || 0} REGISTERED READING${raster?.layerCount===1?'':'S'}`, w * .035, h * .055);
+    ctx.textAlign = 'left'; ctx.fillStyle='#647789';
     if (!raster) {
       ctx.font = `${Math.max(18, w * .026)}px Segoe UI, sans-serif`;
       ctx.fillText(this.model?'Enable a reading layer to see the composition.':'Load a mesh to create high-definition 2D readings.', w * .08, h * .5);
@@ -347,14 +354,14 @@ export class TomographyLab {
     art.getContext('2d').putImageData(pixels, 0, 0);
     const page=this.pageLayout(raster);
     $('lab-page-info').textContent=`${page.w.toLocaleString()} × ${page.h.toLocaleString()} px page`;
-    const margin = Math.min(w,h) * .065, top = h * .11, availableW = w - margin * 2, availableH = h - top - margin;
+    const margin = Math.min(w,h) * .035, top = margin, availableW = w - margin * 2, availableH = h - margin * 2;
     const pageScale=Math.min(availableW/page.w,availableH/page.h);
     const pageW=page.w*pageScale,pageH=page.h*pageScale;
     const pageLeft=(w-pageW)/2,pageTop=top+(availableH-pageH)/2;
     const left=pageLeft+page.x*pageScale,upper=pageTop+page.y*pageScale;
     const aw=page.drawW*pageScale,ah=page.drawH*pageScale;
     ctx.fillStyle=page.background;ctx.fillRect(pageLeft,pageTop,pageW,pageH);
-    ctx.strokeStyle='#8da38e';ctx.lineWidth=Math.max(1,w*.001);ctx.strokeRect(pageLeft,pageTop,pageW,pageH);
+    ctx.strokeStyle='#cbd5df';ctx.lineWidth=Math.max(1,w*.001);ctx.strokeRect(pageLeft,pageTop,pageW,pageH);
     ctx.save();ctx.beginPath();ctx.rect(pageLeft,pageTop,pageW,pageH);ctx.clip();
     ctx.imageSmoothingEnabled=true;ctx.drawImage(art,left,upper,aw,ah);ctx.restore();
     const finish=this.vectorFinish();
@@ -364,8 +371,6 @@ export class TomographyLab {
       preview.style.width=`${aw/w*100}%`;preview.style.height=`${ah/h*100}%`;
       preview.hidden=false;
     }
-    ctx.fillStyle='#a9c4a9';ctx.font = `${Math.max(10, w * .011)}px Consolas, monospace`;
-    ctx.fillText(`${this.modelName.toUpperCase()}  ·  ${raster.layerCount} LAYER${raster.layerCount===1?'':'S'}  ·  ${rw} × ${rh} SOURCE SAMPLES  ·  ${page.w} × ${page.h} PAGE`, w * .035, h * .95);
   }
   contourSegments(raster, level) {
     const { values, w, h } = raster, lines = [];

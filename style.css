@@ -469,6 +469,12 @@ dialog strong{color:#1c4b82}dialog p{color:#647687}.close-dialog{color:#62788a}
 #preview-3d .stage-label,#preview-3d .viewport-bottom,#preview-3d .scan-legend{display:none}
 #preview-3d #viewport:after{display:none}
 .center-orbit-hint{position:absolute;bottom:12px;left:0;right:0;pointer-events:none;text-align:center;font:8px var(--mono);letter-spacing:.6px;color:#567065}
+.linked-3d-status{position:absolute;bottom:28px;left:0;right:0;pointer-events:none;text-align:center;font:8px var(--mono);color:#61768a}
+#preview-3d #art{opacity:0;pointer-events:none}
+#linked-3d-art{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:grab}
+#linked-3d-art:active{cursor:grabbing}
+#linked-3d-vector{position:absolute;pointer-events:none;overflow:hidden}
+#linked-3d-vector svg{display:block;width:100%;height:100%}
 #reading-layout:not([data-display=both]) .center-display-views{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr)}
 @media(min-width:800px) and (max-width:1049px){
  #reading-layout[data-display=both] .center-display-views{grid-template-columns:minmax(0,1fr);grid-template-rows:repeat(2,minmax(0,1fr))}
